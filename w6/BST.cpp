@@ -19,14 +19,14 @@ class BST {
 
     std::shared_ptr<Node> root;
 
-    auto _min( std::shared_ptr<Node> &_node ) const;    // 找最小值
-    auto _max( std::shared_ptr<Node> &_node ) const;    // 找最大值
-    auto _next( std::shared_ptr<Node> &_node ) const;    // 找下一個值
-    auto _prev( std::shared_ptr<Node> &_node ) const;    // 找前一個值
+    auto _min( std::shared_ptr<Node> &_node ) const -> decltype( root );    // 找最小值
+    auto _max( std::shared_ptr<Node> &_node ) const -> decltype( root );    // 找最大值
+    auto _next( std::shared_ptr<Node> &_node ) const -> decltype( root );    // 找下一個值
+    auto _prev( std::shared_ptr<Node> &_node ) const -> decltype( root );    // 找前一個值
 
-    std::ostream &_inorder( std::shared_ptr<Node> &_node, std::ostream & ) const;
-    std::ostream &_preorder( std::shared_ptr<Node> &_node, std::ostream & ) const;
-    std::ostream &_postorder( std::shared_ptr<Node> &_node, std::ostream & ) const;
+    std::ostream &_inorder( std::shared_ptr<Node> &_node, std::ostream & );
+    std::ostream &_preorder( std::shared_ptr<Node> &_node, std::ostream & );
+    std::ostream &_postorder( std::shared_ptr<Node> &_node, std::ostream & );
 
     size_t _size( std::shared_ptr<Node> &_node ) const;
 
@@ -45,13 +45,73 @@ class BST {
     void insert( const T &k );
     void remove( const T &k );
 
-    std::ostream &inorder() const;
-    std::ostream &preorder() const;
-    std::ostream &postorder() const;
+    std::ostream &inorder();
+    std::ostream &preorder();
+    std::ostream &postorder();
 };
 
 template <typename T>
-auto BST<T>::_min( std::shared_ptr<Node> &_node ) const {
+std::ostream &BST<T>::preorder() {
+    if ( isempty() ) {
+        throw std::runtime_error( "Missing element!\n" );
+    }
+    return _preorder( root, std::cout );
+}
+
+template <typename T>
+std::ostream &BST<T>::postorder() {
+    if ( isempty() ) {
+        throw std::runtime_error( "Missing element!\n" );
+    }
+    return _postorder( root, std::cout );
+}
+
+template <typename T>
+std::ostream &BST<T>::inorder() {
+    if ( isempty() ) {
+        throw std::runtime_error( "Missing element!\n" );
+    }
+    return _inorder( root, std::cout );
+}
+
+template <typename T>
+std::ostream &BST<T>::_preorder( std::shared_ptr<Node> &i, std::ostream &o ) {
+    o << i->key << " ";
+    if ( i->left != nullptr ) {
+        _preorder( i->left, o );
+    }
+    if ( i->right != nullptr ) {
+        _preorder( i->right, o );
+    }
+    return o;
+}
+
+template <typename T>
+std::ostream &BST<T>::_postorder( std::shared_ptr<Node> &i, std::ostream &o ) {
+    if ( i->left != nullptr ) {
+        _postorder( i->left, o );
+    }
+    if ( i->right != nullptr ) {
+        _postorder( i->right, o );
+    }
+    o << i->key << " ";
+    return o;
+}
+
+template <typename T>
+std::ostream &BST<T>::_inorder( std::shared_ptr<Node> &i, std::ostream &o ) {
+    if ( i->left != nullptr ) {
+        _inorder( i->left, o );
+    }
+    o << i->key << " ";
+    if ( i->right != nullptr ) {
+        _inorder( i->right, o );
+    }
+    return o;
+}
+
+template <typename T>
+auto BST<T>::_min( std::shared_ptr<Node> &_node ) const -> decltype( root ) {
     auto tmp = _node;
     while ( tmp->left != nullptr )
         tmp = tmp->left;
@@ -60,7 +120,7 @@ auto BST<T>::_min( std::shared_ptr<Node> &_node ) const {
 }
 
 template <typename T>
-auto BST<T>::_max( std::shared_ptr<Node> &_node ) const {
+auto BST<T>::_max( std::shared_ptr<Node> &_node ) const -> decltype( root ) {
     auto tmp = _node;
     while ( tmp->right != nullptr )
         tmp = tmp->right;
@@ -69,7 +129,7 @@ auto BST<T>::_max( std::shared_ptr<Node> &_node ) const {
 }
 
 template <typename T>
-auto BST<T>::_next( std::shared_ptr<Node> &_node ) const {
+auto BST<T>::_next( std::shared_ptr<Node> &_node ) const -> decltype( root ) {
     if ( _node->right != nullptr )
         return _min( _node->right );
 
@@ -86,11 +146,11 @@ auto BST<T>::_next( std::shared_ptr<Node> &_node ) const {
 }
 
 template <typename T>
-auto BST<T>::_prev( std::shared_ptr<Node> &_node ) const {
+auto BST<T>::_prev( std::shared_ptr<Node> &_node ) const -> decltype( root ) {
     if ( _node->left != nullptr )
         return _max( _node->left );
 
-    auto tmp = node->parent();
+    auto tmp = _node->parent();
     while ( tmp->parent() != nullptr ) {
 
         if ( tmp->parent()->right == tmp )
@@ -157,26 +217,47 @@ void BST<T>::insert( const T &k ) {
 
 template <typename T>
 void BST<T>::remove( const T &k ) {
-    if ( root == nullptr )
-        return;
-
     auto tmp = root;
     while ( tmp != nullptr ) {
-        if ( k < tmp->key ) {
-            if ( tmp->left != nullptr )
-                tmp = tmp->left;
-        }
-        else if ( k > tmp->key ) {
-            if ( tmp->right != nullptr )
-                tmp = tmp->right;
-        }
+        if ( k < tmp->key )
+            tmp = tmp->left;
+        else if ( k > tmp->key )
+            tmp = tmp->right;
         else
             break;
     }
 
-    if ( tmp->right == nullptr && tmp->left == nullptr )
-        tmp =
+    if ( tmp == nullptr )
+        return;
+
+    if ( tmp->left == nullptr && tmp->right == nullptr )
+        if ( tmp->parent()->right == tmp )
+            tmp->parent()->right.reset();
+        else
+            tmp->parent()->left.reset();
+    else if ( tmp->right != nullptr && tmp->left != nullptr )
+        tmp = _next( tmp );
+    else if ( tmp->right != nullptr )
+        if ( tmp->parent()->right == tmp )
+            tmp->parent()->right = std::move( tmp->left );
+        else
+            tmp->parent()->left = std::move( tmp->left );
+    else if ( tmp->left != nullptr )
+        if ( tmp->parent()->right == tmp )
+            tmp->parent()->right = std::move( tmp->right );
+        else
+            tmp->parent()->left = std::move( tmp->right );
 }
 
 int main() {
+    BST<int> tree;
+    tree.insert( 2 );
+    tree.insert( 3 );
+    tree.insert( 10 );
+    tree.insert( 4 );
+    tree.insert( 9 );
+    tree.insert( 7 );
+    tree.remove( 7 );
+
+    tree.inorder();
 }
