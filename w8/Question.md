@@ -27,6 +27,8 @@ ex:
 
 結果如下圖所示:
 
+![image](https://github.com/Mes0903/NCU_DS/blob/main/w8/tree1.png?raw=true)
+
 ## 輸出
 
 找到是否存在至少一條路徑，其節點值的總和等於目標值，且路徑必須從root走到leaf
@@ -37,6 +39,7 @@ ex:
 
 以範例輸入當作例子:
 
+![image](https://github.com/Mes0903/NCU_DS/blob/main/w8/tree2.png?raw=true)
 
 沿著紅色節點走，其總和等於目標值
 
