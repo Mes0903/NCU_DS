@@ -20,19 +20,19 @@
 
 ## Sample Input 1
 
-5
-write_DS_homework 100
-watch_video 20
-dump_the_garbage 80
-play_video_game 15
+5<br>
+write_DS_homework 100<br>
+watch_video 20<br>
+dump_the_garbage 80<br>
+play_video_game 15<br>
 prepare_the_final_exam 50
 
 ## Sample Output 1
 
-First three things to do:
-write_DS_homework
-dump_the_garbage
-prepare_the_final_exam
+First three things to do:<br>
+write_DS_homework<br>
+dump_the_garbage<br>
+prepare_the_final_exam<br>
 
 ## 提示
 
